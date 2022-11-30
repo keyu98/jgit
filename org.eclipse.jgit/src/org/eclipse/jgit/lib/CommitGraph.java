@@ -78,14 +78,43 @@ public interface CommitGraph {
 	/**
 	 * Metadata of a commit in commit data chunk.
 	 */
-	interface CommitData {
+	class CommitData {
+
+		private final ObjectId tree;
+
+		private final int[] parents;
+
+		private final long commitTime;
+
+		private final int generation;
+
+		/**
+		 * Initialize the CommitData.
+		 *
+		 * @param tree
+		 *            objectId of tree.
+		 * @param parents
+		 *            the array of parents.
+		 * @param commitTime
+		 *            commit time.
+		 * @param generation
+		 *            the generation number.
+		 */
+		public CommitData(ObjectId tree, int[] parents, long commitTime, int generation) {
+			this.tree = tree;
+			this.parents = parents;
+			this.commitTime = commitTime;
+			this.generation = generation;
+		}
 
 		/**
 		 * Get a reference to this commit's tree.
 		 *
 		 * @return tree of this commit.
 		 */
-		ObjectId getTree();
+		public ObjectId getTree() {
+			return tree;
+		}
 
 		/**
 		 * Obtain an array of all parents.
@@ -96,20 +125,26 @@ public interface CommitGraph {
 		 *
 		 * @return the array of parents.
 		 */
-		int[] getParents();
+		public int[] getParents() {
+			return parents;
+		}
 
 		/**
 		 * Time from the "committer" line.
 		 *
-		 * @return commit time
+		 * @return commit time.
 		 */
-		long getCommitTime();
+		public long getCommitTime() {
+			return commitTime;
+		}
 
 		/**
 		 * Get the generation number(the distance from the root) of the commit.
 		 *
-		 * @return the generation number
+		 * @return the generation number.
 		 */
-		int getGeneration();
+		public int getGeneration() {
+			return generation;
+		}
 	}
 }

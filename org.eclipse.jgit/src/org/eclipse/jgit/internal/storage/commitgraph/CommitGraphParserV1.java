@@ -39,9 +39,9 @@ import org.eclipse.jgit.util.NB;
 /**
  * Support for the commit-graph v1 format.
  *
- * @see CommitGraphFileContent
+ * @see CommitGraph
  */
-class CommitGraphParserV1 implements CommitGraphFileContent {
+class CommitGraphParserV1 implements CommitGraph {
 
 	private static final int FANOUT = 256;
 
@@ -249,19 +249,16 @@ class CommitGraphParserV1 implements CommitGraphFileContent {
 		if (graphPos < 0) {
 			return null;
 		}
-
-		CommitDataImpl commit = new CommitDataImpl();
-
 		// parse tree
-		commit.tree = ObjectId.fromRaw(data, dataIdx);
+		ObjectId tree = ObjectId.fromRaw(data, dataIdx);
 
 		// parse date
 		long dateHigh = NB.decodeUInt32(data, dataIdx + hashLength + 8) & 0x3;
 		long dateLow = NB.decodeUInt32(data, dataIdx + hashLength + 12);
-		commit.commitTime = dateHigh << 32 | dateLow;
+		long commitTime = dateHigh << 32 | dateLow;
 
 		// parse generation
-		commit.generation = NB.decodeInt32(data, dataIdx + hashLength + 8) >> 2;
+		int generation = NB.decodeInt32(data, dataIdx + hashLength + 8) >> 2;
 
 		boolean noParents = false;
 		int[] pList = new int[0];
@@ -297,9 +294,8 @@ class CommitGraphParserV1 implements CommitGraphFileContent {
 				}
 			}
 		}
-		commit.parents = pList;
 
-		return commit;
+		return new CommitData(tree, pList, commitTime, generation);
 	}
 
 	/**
@@ -353,12 +349,6 @@ class CommitGraphParserV1 implements CommitGraphFileContent {
 	@Override
 	public long getCommitCnt() {
 		return commitCnt;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public int getHashLength() {
-		return hashLength;
 	}
 
 	private int findLevelOne(long nthPosition) {

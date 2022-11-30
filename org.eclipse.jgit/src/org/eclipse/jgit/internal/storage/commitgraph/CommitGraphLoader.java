@@ -18,6 +18,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.jgit.errors.CommitGraphFormatException;
 import org.eclipse.jgit.internal.JGitText;
+import org.eclipse.jgit.lib.CommitGraph;
 import org.eclipse.jgit.util.IO;
 import org.eclipse.jgit.util.io.SilentFileInputStream;
 
@@ -44,7 +45,7 @@ public class CommitGraphLoader {
 	 *             the file exists but could not be read due to security errors
 	 *             or unexpected data corruption.
 	 */
-	public static CommitGraphSingleFile open(File graphFile)
+	public static CommitGraph open(File graphFile)
 			throws FileNotFoundException, CommitGraphFormatException,
 			IOException {
 		try (SilentFileInputStream fd = new SilentFileInputStream(graphFile)) {
@@ -78,7 +79,7 @@ public class CommitGraphLoader {
 	 * @throws java.io.IOException
 	 *             the stream cannot be read.
 	 */
-	public static CommitGraphSingleFile read(InputStream fd)
+	public static CommitGraph read(InputStream fd)
 			throws IOException {
 		byte[] hdr = new byte[8];
 		IO.readFully(fd, hdr, 0, hdr.length);
@@ -89,8 +90,6 @@ public class CommitGraphLoader {
 					JGitText.get().unsupportedCommitGraphVersion,
 					Integer.valueOf(v)));
 		}
-
-		CommitGraphFileContent content = new CommitGraphParserV1(fd, hdr);
-		return new CommitGraphSingleFile(content);
+		return new CommitGraphParserV1(fd, hdr);
 	}
 }
